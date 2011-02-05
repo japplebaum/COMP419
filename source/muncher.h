@@ -14,7 +14,7 @@ class Muncher : public Unit {
 
 		Muncher(const Muncher& newMuncher);
 	
-		~Muncher() { s3eDebugOutputString("destroying muncher"); };
+		~Muncher() {};
     
 		virtual bool update(std::list<Unit*>::iterator itr);
         

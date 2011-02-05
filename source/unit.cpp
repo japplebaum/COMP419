@@ -6,21 +6,13 @@ Unit::Unit(const Unit& newUnit)
 	hp(newUnit.hp), cost(newUnit.cost), attackDamage(newUnit.attackDamage), speed(newUnit.speed),
 	munch_speed(newUnit.munch_speed), range(newUnit.range), sight(newUnit.sight),
 	spread_speed(newUnit.spread_speed), spread_radius(newUnit.spread_radius),
-	scale(newUnit.scale), target(NULL), curFrame(0), numFrames(newUnit.numFrames), spriteSize(newUnit.spriteSize),
+	scale(newUnit.scale), target(NULL), curFrame(0), numFrames(newUnit.numFrames),
 	navTarget(CIwFVec2(0, 0)), repulsion_factor(1)
 {
 	setOwner(newUnit.owner);
 	navTarget = CIwFVec2::g_Zero;
-
+	curFrame = 0;
 	pathMode = NORMAL;
-	if(speed > 0.00001f) {
-		if (owner == game->getLocalPlayer()) {
-			enemyLeaderPos = ((Unit*)(game->getOpponentPlayer()->getLeader()))->getPosition();
-		}
-		else {
-			enemyLeaderPos = ((Unit*)(game->getLocalPlayer()->getLeader()))->getPosition();
-		}
-	}
 }
 
 Unit::Unit(float hp, float cost, float attack, float speed, 
@@ -33,34 +25,23 @@ Unit::Unit(float hp, float cost, float attack, float speed,
 		  spread_speed(spread_speed), spread_radius(spread_radius),
 		  curFrame(0), target(NULL), navTarget(CIwFVec2(0, 0)), repulsion_factor(1)
 {
-    
     setOwner(owner);
 	navTarget = CIwFVec2::g_Zero;
-
+	curFrame = 0;
 	pathMode = NORMAL;
-	if(speed > 0.00001f) {
-		if (owner == game->getLocalPlayer()) {
-			enemyLeaderPos = ((Unit*)(game->getOpponentPlayer()->getLeader()))->getPosition();
-		}
-		else {
-			enemyLeaderPos = ((Unit*)(game->getLocalPlayer()->getLeader()))->getPosition();
-		}
-	}
 }
 
 int Unit::getDamage(Unit* unit){
 	return (int) statAttacks[unit->getType()][getType()];
 }
 
-
-
 void Unit::display(){
 	IwGxSetColStream(owner->getColors(), 4);
-    renderImageWorldSpace(position, getAngle(), scale, spriteSize, game->getRotation(), curFrame, numFrames, 0.0f);
+    renderImageWorldSpace(position, getAngle(), scale, UNIT_SPRITE_SIZE, game->getRotation(), curFrame, numFrames, 0.0f);
 
     //UNCOMMENT TO DRAW DEBUG PRIMITIVES. Yellow circle = Unit Sight. Blue circle = Unit bounding volume
     
-	CIwFVec2 circle = navTarget;
+	/*CIwFVec2 circle = navTarget;
 	polarize(circle);
 	circle.y *= -1;
 	polarToXY(circle);
@@ -68,17 +49,11 @@ void Unit::display(){
     CIwMat pMat = CIwMat::g_Identity;
     pMat.SetTrans(CIwVec3(circle.x, circle.y, 1));
     CIwMat rot = CIwMat::g_Identity;
-    rot.SetRotZ(IW_ANGLE_FROM_RADIANS(game->getRotation()));
-
-	if (getType() == MUNCHER) {
-		//IwGxDebugPrimCircle(pMat*rot, 20, 2, IwGxGetColFixed(IW_GX_COLOUR_BLUE), false);
-	}
-    //IwGxDebugPrimCircle(pMat*rot, sight, 2,IwGxGetColFixed(IW_GX_COLOUR_YELLOW), false);
-     
+    rot.SetRotZ(IW_ANGLE_FROM_RADIANS(game->getRotation()))
+    //IwGxDebugPrimCircle(pMat*rot, sight, 2,IwGxGetColFixed(IW_GX_COLOUR_YELLOW), false);*/
 }
 
 void Unit::displayOnScreen(int x, int y){    
-    
     CIwMaterial *mat = new CIwMaterial();
 	mat->SetTexture((CIwTexture*)game->getSprites()->GetResHashed(getTextureName(), IW_GX_RESTYPE_TEXTURE));
     mat->SetModulateMode(CIwMaterial::MODULATE_NONE);
@@ -97,31 +72,14 @@ void Unit::displayOnScreen(int x, int y){
     delete mat;
 }
 
-
+//
+// Getter and setters
+//
 int Unit::getId(){ return uid; }
+
 void Unit::setId(int uid){ this->uid = uid; }
 
-
-Player& Unit::getOwner(){
-	return *owner;
-}
-
-Unit* Unit::getTarget(){ return target; }
-void Unit::setTarget(Unit* unit){
-    if(unit != NULL && unit->getHp() <= 0) {
-        target = NULL;
-	} else {
-		target = unit;
-	}
-	if(target == NULL) {
-		setIdleSprite();
-	}
-}
-
-bool Unit::hasTarget(){
-    return target != NULL;
-}
-
+Player& Unit::getOwner(){ return *owner; }
 
 void Unit::setOwner(Player* p){
 	owner = p;
@@ -135,37 +93,40 @@ void Unit::setOwner(Player* p){
 	}
 }
 
+Unit* Unit::getTarget(){ return target; }
+
+void Unit::setTarget(Unit* unit){
+    if(unit != NULL && unit->getHp() <= 0) {
+        target = NULL;
+	} 
+	else {
+		target = unit;
+	}
+	if(target == NULL) {
+		setIdleSprite();
+	}
+}
+
 float Unit::getHp(){ return hp; }
-float Unit::getRange(){return range;}
 
-void Unit::setHp(float f){
-	hp = f;
-}
+float Unit::getRange(){ return range; }
 
-float Unit::getSpeed(){return speed;}
-float Unit::getSize(){ return spriteSize*scale; }
+float Unit::getSpeed(){return speed; }
 
+float Unit::getSize(){ return UNIT_SPRITE_SIZE*scale; }
 
-void Unit::setVelocity(const CIwFVec2& vel){
-    velocity = vel;
-}
-
-void Unit::setVelocity(float xv, float yv){
-    velocity.x = xv;
-    velocity.y = yv;
-}
-
-CIwFVec2 Unit::getVelocity(){return velocity;}
-
-float Unit::getSight(){ return sight; }
+CIwFVec2 Unit::getVelocity(){ return velocity; }
 
 float Unit::getAngle(){
     CIwFVec2 norm = velocity.GetNormalised();
     return PI + atan2(norm.y, norm.x);
 }
 
-void Unit::attack(){}
+bool Unit::hasTarget(){
+    return target != NULL;
+}
 
+void Unit::attack(){}
 
 void Unit::receiveDamage(float amount, Unit* attacker){
     if(hp <= amount){
@@ -181,6 +142,10 @@ float Unit::distToTarget(){
     return (getTarget()->getPosition() - getPosition()).GetLength();
 }
 
+
+//
+//Pathing/AI methods
+//
 void Unit::path(std::list<Unit*>::iterator itr) {
 	
 	// Normalized vector from this unit to the enemy leader. 
@@ -280,7 +245,6 @@ void Unit::path(std::list<Unit*>::iterator itr) {
 	}
 	
 	if (pathMode == OBJECTIVE && (navTarget-position).GetLengthSquared() <= SQ(range)) {
-		s3eDebugOutputString("made it!");
 		velocity = force.GetNormalised();
 	}
 	else {
@@ -391,7 +355,6 @@ void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
 	target = closest;
 	
 	if (foundTarget) {
-		s3eDebugOutputString("found target");
 		pathMode = OBJECTIVE;
 	}
 }

@@ -2,9 +2,7 @@
 
 Spreader::Spreader(Player* owner, Game* game, float x, float y)
         : Unit(250.0f, 200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, 7.0f, 5.0f, owner, game){
-    spriteSize = 256;
     numFrames = 11;
-    curFrame = 0;
     scale = 0.25f;
     maxSpread = 3;
     sinceLastSpread = 0;

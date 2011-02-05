@@ -3,9 +3,7 @@
 Thrower::Thrower(Player* owner, Game* game, float x, float y)
 	: Unit(200.0f, 300.0f, 0.0f, 8.0f, 20.0f, 60.0f, 80.0f, 0.0f, 0.0f, owner, game)
 {
-    spriteSize = 256;
     numFrames = 8;
-    curFrame = 0;
     scale = 0.5f;
     setPosition(x, y);
 	texture_names.push_back(IwHashString("thrower_walk_sprite_sheet"));
@@ -16,7 +14,6 @@ Thrower::Thrower(const Thrower& newThrower) : Unit(newThrower) { }
 
 bool Thrower::update(std::list<Unit*>::iterator itr){   
     curFrame = (curFrame + 1) % numFrames;
-    
 	return true;
 }
 

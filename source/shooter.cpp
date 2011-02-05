@@ -4,9 +4,7 @@
 Shooter::Shooter(Player* owner, Game* game, float x, float y)
 	: Unit(200.0f, 250.0f, 50.0f, 0.0f, 15.0f, 50.0f, 200.0f, 0.0f, 0.0f, owner, game)
 {
-	spriteSize = 256;
 	numFrames = 7;
-	curFrame = 0;
     scale = 0.35;
 	projectileCount = 0;
     setPosition(x, y);

@@ -3,7 +3,6 @@
 Wrecker::Wrecker(Player* owner, Game* game, float x, float y)
 	: Unit(350.0f, 100.0f, 40.0f, 3.0f, 5.0f, 50.0f, 200.0f, 0.0f, 0.0f, owner, game)
 {
-	spriteSize = 256;
 	numFrames = 6;
 	curFrame = 0;
     scale = 0.2;

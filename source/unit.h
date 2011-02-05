@@ -13,7 +13,8 @@ class Unit;
 #include <vector>
 #include <math.h>
 
-//range in which we will consider repulsion/attraction for pathing
+#define UNIT_SPRITE_SIZE 256
+
 #define PATH_THETA_RANGE PI
 #define THETA_DIFF(X, Y) (min(abs((X)-(Y)), 2*PI - abs((X) - (Y))))
 #define REPEL_FACTOR 8000000
@@ -56,41 +57,30 @@ enum path_mode {
 
 class Unit : public WorldObject {
     
-	protected:    
-		/* Preliminary stats. Subject to change. */
+	protected:
 	    float hp;
 		float cost;
-		float attackDamage;
 		float speed;
-		float munch_speed;
-		float range;
-		float sight;
-		float spread_speed;
-		float spread_radius;
         float scale;
-    
-        float repulsion_factor;
-    
-		Player *owner;
-        bool localPlayedOwnsThis;
-    
-		CIwFVec2 velocity;
+		float repulsion_factor;
+
 		int uid;
-		
+
+		bool localPlayedOwnsThis;
+	
 		//info for sprite animation
-		int spriteSize;
 		int numFrames;
 		int curFrame;
-        
-		std::string unitType;
 
-		CIwFVec2 enemyLeaderPos;
-	
+		CIwFVec2 velocity;	
 		CIwFVec2 navTarget;	//a target the unit will move toward when it's stuck
 		CIwFVec2 navTargetPolar; //polar navigation target
 		path_mode pathMode; //the current pathing mode that we're in
 	
-		Unit *target;
+		CIwFVec2 enemyLeaderPos;
+		Player *owner;
+	
+		std::string unitType;
 	
 		/** 
 		 Calculate a target (the inner or outer wall) for escape pathing
@@ -108,7 +98,7 @@ class Unit : public WorldObject {
 
 		Unit(const Unit& newUnit);
 
-		virtual ~Unit() { s3eDebugOutputString("destroying unit");  };
+		virtual ~Unit() {};
     	
 		virtual unit_type getType() = 0;
 
@@ -149,7 +139,8 @@ class Unit : public WorldObject {
 		
 		virtual void attack();
 	
-        void receiveDamage(float amount, Unit* attacker); 
+        void receiveDamage(float amount); 
+	
         int getDamage(Unit* unit);
 
 
@@ -164,7 +155,6 @@ class Unit : public WorldObject {
 		virtual void setAttackSprite(){};
 		virtual void setIdleSprite(){};
     
-        float getSight();
         virtual float getAngle();
     
         float distToTarget();
@@ -172,8 +162,6 @@ class Unit : public WorldObject {
 		void path(std::list<Unit*>::iterator itr);
 	
 		void detectEnemy(std::list<Unit*>::iterator unit_itr);
-
-
 };
 
 #endif
