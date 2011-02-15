@@ -20,21 +20,16 @@ class WorldObject {
 	
 	public:
         WorldObject(Game *game);
+	
 		WorldObject(CIwFVec2 position, Game* game);
 		
 		WorldObject(const WorldObject& newObj);
 	
-		virtual ~WorldObject() { s3eDebugOutputString("destroying worldobject"); };
-	
-		void setPosition(float x, float y);
-	
+		virtual ~WorldObject() { };
+		
 		void setPosition(const CIwFVec2& position);
 	
-		CIwFVec2 getPosition();	
-	
-		float getX();
-	
-		float getY();
+		CIwFVec2 getPosition();
 	
 		void setPolarPosition(float _r, float _theta);
     
@@ -52,7 +47,6 @@ class WorldObject {
 
 
 	protected:
-		
 		Game* game;
 	
 		CIwFVec2 position;

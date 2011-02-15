@@ -4,23 +4,18 @@
 class Muncher;
 
 #include "unit.h"
-#include <map>
 
 class Muncher : public Unit {
 
 	public:
-
-		Muncher(Player* owner, Game* game, float x, float y);
+		Muncher(Player* owner, CIwFVec2 position, Game* game);
 
 		Muncher(const Muncher& newMuncher);
 	
 		~Muncher() {};
     
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
         
-        virtual void attack();
-        virtual int getDamage(Unit* unit);
-
 		virtual unit_type getType();
 	
 		virtual Unit* spawnCopy();

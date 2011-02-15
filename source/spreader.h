@@ -43,15 +43,18 @@ class Spreader : public Unit {
         IceMap icingMap;
     
 	public:
-		Spreader(Player* owner, Game* game, float x, float y);
+		Spreader(Player* owner, CIwFVec2 position, Game* game);
+	
 		Spreader(const Spreader& newSpreader);
+	
 		~Spreader();
 
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
 
 		virtual unit_type getType();
+	
 		virtual Unit* spawnCopy();
-        virtual bool shouldAIUpdate();
+	
         IceMap* getIcing();
 };
 

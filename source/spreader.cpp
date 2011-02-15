@@ -1,13 +1,12 @@
 #include "spreader.h"
 
-Spreader::Spreader(Player* owner, Game* game, float x, float y)
-        : Unit(250.0f, 200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, 7.0f, 5.0f, owner, game){
+Spreader::Spreader(Player* owner, CIwFVec2 position, Game* game)
+        : Unit(250.0f, 200.0f, 0.0f, owner, position, game){
     numFrames = 11;
     scale = 0.25f;
     maxSpread = 3;
     sinceLastSpread = 0;
 	spreadDelay = 12;
-    setPosition(x, y);
 	worldRad = game->getWorldRadius();
 	texture_names.push_back(IwHashString("spreader_sprite_sheet"));
     srand(time(NULL));
@@ -28,11 +27,7 @@ Spreader::Spreader(const Spreader& newSpreader) : Unit(newSpreader) {
 	worldRad = game->getWorldRadius();
 }
 
-bool Spreader::shouldAIUpdate() {
-    return false;
-}
-
-bool Spreader::update(std::list<Unit*>::iterator itr){
+void Spreader::update(){
     // Create icing in a winding out counter-clockwise pattern.
     if(icingMap.size() < maxIcingCount && sinceLastSpread % spreadDelay == 0) {
 
@@ -67,7 +62,6 @@ bool Spreader::update(std::list<Unit*>::iterator itr){
     ++sinceLastSpread;
 
 	curFrame = (curFrame + 1) % numFrames;
-    return true;
 }
 
 Spreader::~Spreader() {

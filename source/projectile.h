@@ -1,20 +1,20 @@
 #ifndef _PROJECTILE_H_
 #define _PROJECTILE_H_
 
-#include "unit.h"
+#include "attackingunit.h"
 
-class Projectile : public Unit {
+class Projectile : public AttackingUnit {
 	
 	public:
-		
-		Projectile(Player* owner, Game* game, float x, float y, CIwFVec2 velocity, Unit* _target);
+		Projectile(Player* owner, CIwFVec2 position, Game* game);
 	
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
 	
 		virtual unit_type getType();
+	
+		virtual void attack();
 
 	private:
-		
 		CIwFVec2 worldRad;
 		
 		float minTargetDist;

@@ -1,23 +1,18 @@
 #include "wrecker.h"
 
-Wrecker::Wrecker(Player* owner, Game* game, float x, float y)
-	: Unit(350.0f, 100.0f, 40.0f, 3.0f, 5.0f, 50.0f, 200.0f, 0.0f, 0.0f, owner, game)
-{
+Wrecker::Wrecker(Player* owner, CIwFVec2 position, Game* game)
+	: AttackingUnit(350.0f, 100.0f, 40.0f, 3.0f, owner, position, game) {
 	numFrames = 6;
-	curFrame = 0;
     scale = 0.2;
-    setPosition(x, y);
 	texture_names.push_back(IwHashString("wrecker_walk_sprite_sheet"));
 	texture_names.push_back(IwHashString("wrecker_attack_sprite_sheet"));
 }
  
-Wrecker::Wrecker(const Wrecker& newWrecker) : Unit(newWrecker) { }
+Wrecker::Wrecker(const Wrecker& newWrecker) : AttackingUnit(newWrecker) { }
 
-bool Wrecker::update(std::list<Unit*>::iterator itr){
+void Wrecker::update() {
 	curFrame = (curFrame + 1) % numFrames;
-	path(itr);
-	if (target != NULL) attack();
-    return true;
+	path();
 }
 
 void Wrecker::setAttackSprite() {
@@ -50,9 +45,6 @@ Unit* Wrecker::spawnCopy() {
 	return new Wrecker(*this);
 }
 
-void Wrecker::attack(){
-    if((target->getPosition()-position).GetLength() <= range){
-		setAttackSprite();
-        target->receiveDamage(getDamage(target), this);
-    }
+void Wrecker::attack(){ 
+
 }

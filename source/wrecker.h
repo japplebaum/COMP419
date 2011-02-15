@@ -1,22 +1,27 @@
 #ifndef _WRECKER_H
 #define _WRECKER_H
 
-#include "unit.h"
-#include <map>
+#include "attackingunit.h"
 
-class Wrecker : public Unit {
+class Wrecker : public AttackingUnit {
+	
 	public:
-		Wrecker(Player* owner, Game* game, float x, float y);
+		Wrecker(Player* owner, CIwFVec2 position, Game* game);
+	
 		Wrecker(const Wrecker& wrecker);
-		~Wrecker(){};
+	
+		~Wrecker(){ };
 
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
+	
 		virtual unit_type getType();
+	
 		virtual Unit* spawnCopy();
+	
         virtual void attack();
-        virtual int getDamage(Unit* unit);
-
+	
 		virtual void setAttackSprite();
+	
 		virtual void setIdleSprite();
 };
 

@@ -83,6 +83,7 @@ class Game {
 	
 		std::list<Icing*>* getOpponentIcing();
 		UnitBucket* getUnitBucket();
+		
 		/**
 		 * Gets the inner and outer radii of the world donut.
 		 *

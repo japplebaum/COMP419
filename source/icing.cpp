@@ -6,8 +6,7 @@ Icing::Icing(const CIwFVec2 position, Game* game, Player* owner) : owner(owner),
 	texture_names.push_back(IwHashString("icing"));
 }
 
-Icing::Icing(const Icing& newIcing) : owner(newIcing.owner), scale(0.02f), finalScale(.12f), WorldObject(newIcing) {
-}
+Icing::Icing(const Icing& newIcing) : owner(newIcing.owner), scale(0.02f), finalScale(.12f), WorldObject(newIcing) { }
 
 Player* Icing::getOwner() {
 	return owner;

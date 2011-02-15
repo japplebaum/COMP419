@@ -7,12 +7,16 @@
 class Leader : public Unit {
 	private:
 		short framesUntilUpdate;
+	
 	public:
-		Leader(Player* owner, Game* game, float x, float y);
+		Leader(Player* owner, CIwFVec2 position, Game* game);
+	
 		~Leader(){};
 
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
+	
 		virtual unit_type getType();
+	
 		virtual float getAngle();
 };
 

@@ -21,37 +21,23 @@ unsigned int WorldObject::getTextureName() {
 	return texture_names[current_texture_index];
 }
 
-void WorldObject::setPosition(float x, float y) {
-    position = CIwFVec2(x, y);
-    
-    CIwFVec2 polar(position);
-	polarize(polar);
-	r = polar.x;
-	theta = polar.y;
-}
-
 bool WorldObject::operator<(const WorldObject& u) const{
 	return theta < u.theta;
 }
 
 void WorldObject::setPosition(const CIwFVec2& newPosition) {
-    setPosition(newPosition.x, newPosition.y);
+	position = newPosition;
+	CIwFVec2 polar(position);
+	polarize(polar);
+	r = polar.x;
+	theta = polar.y;
 }
 
 CIwFVec2 WorldObject::getPosition() {
 	return position; 
 }
 
-float WorldObject::getX() {
-	return position.x;
-}
-
-float WorldObject::getY() {
-	return position.y;
-}
-
 void WorldObject::setPolarPosition(float _r, float _theta){
-	
 	r = _r;
 	theta = _theta;
     while(theta > 2 * PI) theta -= 2*PI;

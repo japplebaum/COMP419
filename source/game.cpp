@@ -127,8 +127,7 @@ void Game::addUnit(Unit *u, bool pay){
 void Game::tick(){
 
 	for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {
-        (*itr)->update(itr);
-		if (timesteps % 12 == 0) (*itr)->detectEnemy(itr);
+        (*itr)->update();
     }
     
     for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {

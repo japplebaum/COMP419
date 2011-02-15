@@ -111,23 +111,23 @@ void MultiTouchButtonCB(s3ePointerTouchEvent* event) {
                 switch (y / 55) {
                     case 0:
                         unit_ui->SetTexture((CIwTexture*)palateGroup->GetResNamed("TAKE2_MINUS_THROWER", IW_GX_RESTYPE_TEXTURE));
-                        touch->unit = new Thrower(localPlayer, game, 0, 0);
+                        touch->unit = new Thrower(localPlayer, CIwFVec2(0,0), game);
                         break;
                     case 1:
                         unit_ui->SetTexture((CIwTexture*)palateGroup->GetResNamed("TAKE2_MINUS_WRECKER", IW_GX_RESTYPE_TEXTURE));
-                        touch->unit = new Wrecker(localPlayer, game, 0, 0);
+                        touch->unit = new Wrecker(localPlayer, CIwFVec2(0,0), game);
                         break;
                     case 2: 
                         unit_ui->SetTexture((CIwTexture*)palateGroup->GetResNamed("TAKE2_MINUS_MUNCHER", IW_GX_RESTYPE_TEXTURE));
-                        touch->unit = new Muncher(localPlayer, game, 0, 0);
+                        touch->unit = new Muncher(localPlayer, CIwFVec2(0,0), game);
                         break;
                     case 3:
                         unit_ui->SetTexture((CIwTexture*)palateGroup->GetResNamed("TAKE2_MINUS_SHOOTER", IW_GX_RESTYPE_TEXTURE));
-                        touch->unit = new Shooter(localPlayer, game, 0, 0);
+                        touch->unit = new Shooter(localPlayer, CIwFVec2(0,0), game);
                         break;
                     case 4: 
                         unit_ui->SetTexture((CIwTexture*)palateGroup->GetResNamed("TAKE2_MINUS_SPREADER", IW_GX_RESTYPE_TEXTURE));
-                        touch->unit = new Spreader(localPlayer, game, 0, 0);
+                        touch->unit = new Spreader(localPlayer, CIwFVec2(0,0), game);
                         break;
                     default: break;
                 }
@@ -203,11 +203,11 @@ void init(){
     	
     CIwFVec2 pos(game->getWorldRadius().y, PI/30);
     polarToXY(pos);
-	Leader* localLeader = new Leader(localPlayer, game, pos.x, pos.y);
+	Leader* localLeader = new Leader(localPlayer, CIwFVec2(pos), game);
     pos.x = game->getWorldRadius().y;
     pos.y = PI - PI/30;
     polarToXY(pos);
-	Leader* opponentLeader = new Leader(opponentPlayer, game, pos.x, pos.y);
+	Leader* opponentLeader = new Leader(opponentPlayer, CIwFVec2(pos), game);
     
 	game->addUnit(localLeader);
 	game->addUnit(opponentLeader);

@@ -1,26 +1,18 @@
 #include "muncher.h"
 
-Muncher::Muncher(Player* owner, Game* game, float x, float y)
-		 : Unit(100.0f, 50.0f, 10.0f, 4.0f, 10.0f, 5.0f, 10.0f, 0.0f, 0.0f, owner, game)
+Muncher::Muncher(Player* owner, CIwFVec2 position, Game* game)
+		 : Unit(100.0f, 50.0f, 10.0f, owner, position, game)
 {
 	numFrames = 12;
-    scale = 0.2f;
-    setPosition(x, y);
+	scale = .2f;
 	texture_names.push_back(IwHashString("muncher_sprite_sheet"));
 }
 
-Muncher::Muncher(const Muncher& newMuncher) : Unit(newMuncher) {}
+Muncher::Muncher(const Muncher& newMuncher) : Unit(newMuncher) { }
 
-bool Muncher::update(std::list<Unit*>::iterator itr) {
+void Muncher::update() {
     curFrame = (curFrame + 1) % numFrames;   
-	path(itr);
-	return true;
-}
-
-void Muncher::attack(){
-    if((target->getPosition()-position).GetLength() <= range){
-        target->receiveDamage(getDamage(target), this);
-    }
+	path();
 }
 
 Unit* Muncher::spawnCopy() {

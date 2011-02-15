@@ -8,7 +8,6 @@
 class Icing : public WorldObject {
 	
 	private:
-	
 		Player* owner;
 	
 		float angle;

@@ -1,11 +1,10 @@
 #include "leader.h"
 
-Leader::Leader(Player* owner, Game* game, float x, float y)
-		: Unit(250.0f, 200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 200.0f, 7.0f, 5.0f, owner, game){
+Leader::Leader(Player* owner, CIwFVec2 position, Game* game)
+		: Unit(250.0f, 200.0f, 0.0f, owner, position, game){
     numFrames = 3;
     scale = 0.5f;
 	framesUntilUpdate = 0;
-    setPosition(x, y);
 	texture_names.push_back(IwHashString("leader_sprite_sheet"));
     
     CIwFVec2 icePos(r, theta);
@@ -15,15 +14,13 @@ Leader::Leader(Player* owner, Game* game, float x, float y)
     game->addIcing(ice);
 }
 
-bool Leader::update(std::list<Unit*>::iterator itr) {
+void Leader::update() {
 	if (framesUntilUpdate == 0) {
 		curFrame = IwRandMinMax(0, numFrames-1);
 		framesUntilUpdate = 24;
 	} else {
 		--framesUntilUpdate;
 	}
-
-	return true;
 }
 
 unit_type Leader::getType(){

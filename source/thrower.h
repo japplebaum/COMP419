@@ -1,22 +1,25 @@
 #ifndef _THROWER_H
 #define _THROWER_H
 
-#include "unit.h"
+#include "attackingunit.h"
 
-class Thrower : public Unit {
+class Thrower : public AttackingUnit {
     private:
         int framesUntilUpdate;
+	
 	public:
-		Thrower(Player* owner, Game* game, float x, float y);
+		Thrower(Player* owner, CIwFVec2 position, Game* game);
+	
 		Thrower(const Thrower& newThrower);
-		~Thrower(){};
+	
+		~Thrower(){ };
         
         virtual void attack();
-        virtual int getDamage(Unit* unit);
 
-        virtual bool update(std::list<Unit*>::iterator itr);
+        virtual void update();
 
 		virtual unit_type getType();
+	
 		virtual Unit* spawnCopy();
 };
 

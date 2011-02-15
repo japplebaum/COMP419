@@ -1,24 +1,22 @@
 #ifndef _SHOOTER_H
 #define _SHOOTER_H
 
-#include "unit.h" 
+#include "attackingunit.h" 
 
-class Shooter : public Unit {
+class Shooter : public AttackingUnit {
 	public:
-		Shooter(Player* owner, Game* game, float x, float y);
+		Shooter(Player* owner, CIwFVec2 position, Game* game);
+	
 		Shooter(const Shooter& newShooter);
-		~Shooter(){ s3eDebugOutputString("destroying shooter"); };
 
-		virtual bool update(std::list<Unit*>::iterator itr);
+		virtual void update();
 
 		virtual unit_type getType();
 	
 		virtual Unit* spawnCopy();
 
-        virtual void attack();
-        virtual int getDamage(Unit* unit);
-        virtual bool shouldAIUpdate();
-	
+        void attack();
+			
 	private:
 	
 		int projectileCount;

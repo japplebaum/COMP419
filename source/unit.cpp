@@ -1,41 +1,24 @@
 #include "unit.h"
 #include "IwGeom.h"
 
-Unit::Unit(const Unit& newUnit)
-	: WorldObject(newUnit), 
-	hp(newUnit.hp), cost(newUnit.cost), attackDamage(newUnit.attackDamage), speed(newUnit.speed),
-	munch_speed(newUnit.munch_speed), range(newUnit.range), sight(newUnit.sight),
-	spread_speed(newUnit.spread_speed), spread_radius(newUnit.spread_radius),
-	scale(newUnit.scale), target(NULL), curFrame(0), numFrames(newUnit.numFrames),
-	navTarget(CIwFVec2(0, 0)), repulsion_factor(1)
+Unit::Unit(const Unit& newUnit): WorldObject(newUnit), hp(newUnit.hp), cost(newUnit.cost), 
+	speed(newUnit.speed), curFrame(0), numFrames(newUnit.numFrames), pathMode(NORMAL)
 {
 	setOwner(newUnit.owner);
-	navTarget = CIwFVec2::g_Zero;
-	curFrame = 0;
-	pathMode = NORMAL;
+	setPosition(position);
 }
 
-Unit::Unit(float hp, float cost, float attack, float speed, 
-		float munch_speed, float range, float sight,
-		float spread_speed, float spread_radius, Player* owner,
-		Game* game)
-		: WorldObject(game),
-		  hp(hp), cost(cost), attackDamage(attack), speed(speed),
-		  munch_speed(munch_speed), range(range), sight(sight),
-		  spread_speed(spread_speed), spread_radius(spread_radius),
-		  curFrame(0), target(NULL), navTarget(CIwFVec2(0, 0)), repulsion_factor(1)
+Unit::Unit(float hp, float cost, float speed, Player* owner, CIwFVec2 position, Game* game): WorldObject(position, game), hp(hp), 
+	cost(cost), speed(speed), curFrame(0), pathMode(NORMAL)
 {
     setOwner(owner);
-	navTarget = CIwFVec2::g_Zero;
-	curFrame = 0;
-	pathMode = NORMAL;
 }
 
 int Unit::getDamage(Unit* unit){
 	return (int) statAttacks[unit->getType()][getType()];
 }
 
-void Unit::display(){
+void Unit::display() {
 	IwGxSetColStream(owner->getColors(), 4);
     renderImageWorldSpace(position, getAngle(), scale, UNIT_SPRITE_SIZE, game->getRotation(), curFrame, numFrames, 0.0f);
 
@@ -93,25 +76,9 @@ void Unit::setOwner(Player* p){
 	}
 }
 
-Unit* Unit::getTarget(){ return target; }
-
-void Unit::setTarget(Unit* unit){
-    if(unit != NULL && unit->getHp() <= 0) {
-        target = NULL;
-	} 
-	else {
-		target = unit;
-	}
-	if(target == NULL) {
-		setIdleSprite();
-	}
-}
-
 float Unit::getHp(){ return hp; }
 
-float Unit::getRange(){ return range; }
-
-float Unit::getSpeed(){return speed; }
+float Unit::getSpeed(){ return speed; }
 
 float Unit::getSize(){ return UNIT_SPRITE_SIZE*scale; }
 
@@ -122,31 +89,12 @@ float Unit::getAngle(){
     return PI + atan2(norm.y, norm.x);
 }
 
-bool Unit::hasTarget(){
-    return target != NULL;
-}
-
-void Unit::attack(){}
-
-void Unit::receiveDamage(float amount, Unit* attacker){
-    if(hp <= amount){
-        attacker->setTarget(NULL);
-    }
-    
-    hp -= amount;
-}
-
-float Unit::distToTarget(){
-    if(!hasTarget()) return -1;
-    
-    return (getTarget()->getPosition() - getPosition()).GetLength();
-}
-
+void Unit::receiveDamage(float amount){ hp -= amount; }
 
 //
 //Pathing/AI methods
 //
-void Unit::path(std::list<Unit*>::iterator itr) {
+void Unit::path() {
 	
 	// Normalized vector from this unit to the enemy leader. 
 	// Need this for normal pathing and escape pathing.
@@ -165,26 +113,25 @@ void Unit::path(std::list<Unit*>::iterator itr) {
 	Unit* curUnit; //current repelling unit in loop
 	
 	//sum up all of the repulsive forces on this unit
-	for (itr = units->begin() ; itr != units->end(); ++itr) {
+	for (std::list<Unit*>::iterator itr = units->begin() ; itr != units->end(); ++itr) {
 		curUnit = *(itr);
 		
 		if (curUnit != this && curUnit->getType() != PROJECTILE) {
 			dirToward = position - curUnit->getPosition();
 			float dist = dirToward.GetLengthSquared();
-			repulsionSum += dirToward.GetNormalised() * (repulsion_factor * curUnit->getSize()*REPEL_FACTOR / pow(dist, 1.875));
+			repulsionSum += dirToward.GetNormalised() * (curUnit->getSize()*REPEL_FACTOR / pow(dist, 1.875));
 		}
 	}
 	
 	force += repulsionSum;
 
 	if (pathMode == OBJECTIVE) {
-		if (target != NULL) {
+		/*if (target != NULL) {
 			navTarget = target->getPosition();
 		}
 		else {
 			pathMode = NORMAL;
-		}
-
+		}*/
 	}
 	
 	// if not escape pathing, add at least the circular pathing force 
@@ -244,7 +191,7 @@ void Unit::path(std::list<Unit*>::iterator itr) {
 		if(pathMode == ESCAPE) setEscapeTarget(toLeader, force);
 	}
 	
-	if (pathMode == OBJECTIVE && (navTarget-position).GetLengthSquared() <= SQ(range)) {
+	if (pathMode == OBJECTIVE /*&& (navTarget-position).GetLengthSquared() <= SQ(range)*/) {
 		velocity = force.GetNormalised();
 	}
 	else {
@@ -294,68 +241,3 @@ void Unit::setEscapeTarget(CIwFVec2 toLeader, CIwFVec2 force) {
 	
 	pathMode = ESCAPE;
 }
-
-
-void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
-    std::list<Unit*>* units = game->getUnits();
-    CIwFVec2 position = (*unit_itr)->getPosition() + (*unit_itr)->getVelocity();
-    CIwFVec2 otherPos = CIwFVec2::g_Zero;
-    
-    float sq_dist = 0;
-    float closest_distance = SQ((*unit_itr)->getSight());
-    float max_dist = closest_distance;
-    Unit* closest = (*unit_itr)->getTarget();
-	
-	bool foundTarget = false;
-    
-    /**
-	* In order to avoid brute-force distance calculations, we take advantage of
-	* the fact that the units are sorted by their theta values. We begin our distance
-	* checking at the given unit's position in the sorted container, then at each
-	* step, check the unit with the next nearest theta, and see if it's close enough.
-	* 
-	* We stop once we've reached a unit that is completely outside the sight range,
-	* We do the same thing in both directions to find the closest unit.
-	*/
-    std::list<Unit*>::iterator incr_theta_itr = unit_itr;
-    std::list<Unit*>::iterator decr_theta_itr = unit_itr;
-    while(incr_theta_itr != units->end() && sq_dist <= max_dist) {
-	// Look up theta, which means we're moving to the BACK of the container
-		if(&(*incr_theta_itr)->getOwner() != &(*unit_itr)->getOwner()) {
-			otherPos = (*incr_theta_itr)->getPosition();
-			sq_dist = SQ(position.x - otherPos.x) + SQ(position.y - otherPos.y);
-			
-			if(sq_dist < closest_distance && (*decr_theta_itr)->getHp() > 0 && (*incr_theta_itr)->getType() != PROJECTILE) {
-				closest_distance = sq_dist;
-				closest = *(incr_theta_itr);
-				foundTarget = true;
-			}
-		}
-		++incr_theta_itr;
-	}
-
-	// Must reset the distance here since we're switching directions.
-	sq_dist = 0.0f;
-	while(decr_theta_itr != units->begin() && sq_dist <= max_dist) {
-		// Look down theta, which means we're moving to the FRONT of the container. 
-		if(&(*decr_theta_itr)->getOwner() != &(*unit_itr)->getOwner()) {
-			otherPos = (*decr_theta_itr)->getPosition();
-			sq_dist = SQ(position.x - otherPos.x) + SQ(position.y - otherPos.y);
-			
-			if(sq_dist < closest_distance && (*decr_theta_itr)->getHp() > 0 && (*decr_theta_itr)->getType() != PROJECTILE) {
-				closest_distance = sq_dist;
-				closest = *(decr_theta_itr);
-				foundTarget = true;
-			}
-		}
-		--decr_theta_itr;
-	}
-	
-	
-	target = closest;
-	
-	if (foundTarget) {
-		pathMode = OBJECTIVE;
-	}
-}
-

@@ -7,6 +7,8 @@ files
     game.cpp
     unit.h
     unit.cpp
+	attackingunit.h
+	attackingunit.cpp
     muncher.h
     muncher.cpp
     player.h
