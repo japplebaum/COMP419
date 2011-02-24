@@ -3,16 +3,13 @@
 
 #include "attackingunit.h"
 
-class Thrower : public AttackingUnit {
-    private:
-        int framesUntilUpdate;
-	
+class Thrower : public AttackingUnit {	
 	public:
 		Thrower(Player* owner, CIwFVec2 position, Game* game);
 	
 		Thrower(const Thrower& newThrower);
 	
-		~Thrower(){ };
+		~Thrower() { };
         
         virtual void attack();
 

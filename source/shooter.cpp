@@ -2,7 +2,7 @@
 #include "projectile.h"
 
 Shooter::Shooter(Player* owner, CIwFVec2 position, Game* game)
-	: AttackingUnit(200.0f, 250.0f, 50.0f, 0.0f, owner, position, game)
+	: AttackingUnit(200.0f, 250.0f, 50.0f, owner, position, game)
 {
 	numFrames = 7;
     scale = 0.35;

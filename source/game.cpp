@@ -91,7 +91,7 @@ void Game::addUnit(Unit *u, bool pay){
     CIwFVec2 pos = u->getPosition();
     std::list<Icing*> *icing = &localIcing;
     
-    if(&u->getOwner() == opponentPlayer)
+    if(u->owner == opponentPlayer)
         icing = &opponentIcing;
 
     bool paid_for = !pay;
@@ -109,7 +109,7 @@ void Game::addUnit(Unit *u, bool pay){
 		return;
 	}*/
 
-    u->setId(numUnits++);
+    u->uid = numUnits++;
 
 	//mirror player
 	if (!s3eExtIPhoneGameKitAvailable() && u->getType() != WRECKER && u->getType() != PROJECTILE) {
@@ -131,7 +131,7 @@ void Game::tick(){
     }
     
     for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {
-        if((*itr)->getHp() <= 0){
+        if((*itr)->hp <= 0){
 			// Remove the unit from all data structures
 			unitBucket[(*itr)->getTextureName()]->erase(unitBucket[(*itr)->getTextureName()]->find((*itr)));
 			delete *itr;
@@ -195,7 +195,7 @@ void Game::renderSprites() {
 		std::set<Unit*>* renderUnits = (*itr).second;
 		
 		for (std::set<Unit*>::iterator u_it = renderUnits->begin(); u_it != renderUnits->end(); ++u_it) {
-            if((*u_it) != NULL && (*u_it)->getHp() <= 0){
+            if((*u_it) != NULL && (*u_it)->hp <= 0){
                 renderUnits->erase(u_it);
             }
             

@@ -3,23 +3,27 @@
 
 #include "unit.h"
 
+/**
+A unit that is somehow capable of attacking another unit. Along with standard unit methods,
+has the ability to set a target, check if the target is in range, and deal damage to it.
+*/
 class AttackingUnit : public Unit {
 	public:
-		AttackingUnit(float hp, float cost, float speed, float range, Player* owner, CIwFVec2 position, Game* game);
+		AttackingUnit(float hp, float speed, float range, Player* owner, CIwFVec2 position, Game* game);
 	
 		virtual ~AttackingUnit() { };
 	
 		virtual Unit* spawnCopy() = 0;
-		
+	
+		void setTarget(Unit* unit);
+
 		Unit* getTarget();
 	
+		float distToTarget();
+
 		virtual void update() = 0;
 	
 		virtual unit_type getType() = 0;
-			
-		void setTarget(Unit* unit);
-	
-		float distToTarget();
 	
 	protected:
 		Unit* target;

@@ -1,10 +1,11 @@
 #include "muncher.h"
 
 Muncher::Muncher(Player* owner, CIwFVec2 position, Game* game)
-		 : Unit(100.0f, 50.0f, 10.0f, owner, position, game)
+		 : Unit(100.0f, 4.0f, owner, position, game)
 {
 	numFrames = 12;
 	scale = .2f;
+	
 	texture_names.push_back(IwHashString("muncher_sprite_sheet"));
 }
 

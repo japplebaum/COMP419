@@ -1,9 +1,10 @@
 #include "wrecker.h"
 
 Wrecker::Wrecker(Player* owner, CIwFVec2 position, Game* game)
-	: AttackingUnit(350.0f, 100.0f, 40.0f, 3.0f, owner, position, game) {
+	: AttackingUnit(350.0f, 3.0f, 40.0f, owner, position, game) {
 	numFrames = 6;
     scale = 0.2;
+		
 	texture_names.push_back(IwHashString("wrecker_walk_sprite_sheet"));
 	texture_names.push_back(IwHashString("wrecker_attack_sprite_sheet"));
 }

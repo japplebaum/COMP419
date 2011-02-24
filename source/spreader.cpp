@@ -1,7 +1,7 @@
 #include "spreader.h"
 
 Spreader::Spreader(Player* owner, CIwFVec2 position, Game* game)
-        : Unit(250.0f, 200.0f, 0.0f, owner, position, game){
+        : Unit(250.0f, 0.0f, owner, position, game){
     numFrames = 11;
     scale = 0.25f;
     maxSpread = 3;

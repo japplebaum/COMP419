@@ -1,12 +1,10 @@
 #include "attackingunit.h"
 
-AttackingUnit::AttackingUnit(float hp, float cost, float speed, float range, Player* owner, CIwFVec2 position, Game* game): 
-	Unit(hp, cost, speed, owner, position, game), range(range) { }
-
-Unit* AttackingUnit::getTarget() { return target; }
+AttackingUnit::AttackingUnit(float hp, float speed, float range, Player* owner, CIwFVec2 position, Game* game): 
+	Unit(hp, speed, owner, position, game), range(range) { }
 
 void AttackingUnit::setTarget(Unit* unit){
-    if(unit != NULL && unit->getHp() <= 0) {
+    if(unit != NULL && unit->hp <= 0) {
         target = NULL;
 	} 
 	else {
@@ -16,6 +14,8 @@ void AttackingUnit::setTarget(Unit* unit){
 		setIdleSprite();
 	}
 }
+
+Unit* AttackingUnit::getTarget() { return target; }
 
 float AttackingUnit::distToTarget(){    
     return (target->getPosition() - getPosition()).GetLength();
@@ -28,7 +28,6 @@ bool AttackingUnit::targetInRange() {
 bool AttackingUnit::canAttack() {
 	return target != NULL && targetInRange();
 }
-
 
 void AttackingUnit::detectEnemy() {
     /*std::list<Unit*>* units = game->getUnits();

@@ -1,15 +1,15 @@
 #include "unit.h"
 #include "IwGeom.h"
 
-Unit::Unit(const Unit& newUnit): WorldObject(newUnit), hp(newUnit.hp), cost(newUnit.cost), 
+Unit::Unit(const Unit& newUnit): WorldObject(newUnit), hp(newUnit.hp), 
 	speed(newUnit.speed), curFrame(0), numFrames(newUnit.numFrames), pathMode(NORMAL)
 {
 	setOwner(newUnit.owner);
 	setPosition(position);
 }
 
-Unit::Unit(float hp, float cost, float speed, Player* owner, CIwFVec2 position, Game* game): WorldObject(position, game), hp(hp), 
-	cost(cost), speed(speed), curFrame(0), pathMode(NORMAL)
+Unit::Unit(float hp, float speed, Player* owner, CIwFVec2 position, Game* game): WorldObject(position, game), hp(hp), 
+	speed(speed), curFrame(0), pathMode(NORMAL)
 {
     setOwner(owner);
 }
@@ -36,14 +36,14 @@ void Unit::display() {
     //IwGxDebugPrimCircle(pMat*rot, sight, 2,IwGxGetColFixed(IW_GX_COLOUR_YELLOW), false);*/
 }
 
-void Unit::displayOnScreen(int x, int y){    
+void Unit::displayOnScreen(CIwSVec2 pos){    
     CIwMaterial *mat = new CIwMaterial();
 	mat->SetTexture((CIwTexture*)game->getSprites()->GetResHashed(getTextureName(), IW_GX_RESTYPE_TEXTURE));
     mat->SetModulateMode(CIwMaterial::MODULATE_NONE);
     mat->SetAlphaMode(CIwMaterial::ALPHA_DEFAULT);
     IwGxSetMaterial(mat);
     
-	CIwSVec2 xy(x-45, y-45);
+	CIwSVec2 xy(pos.x-45, pos.y-45);
     CIwSVec2 duv(IW_FIXED(1.0/numFrames), IW_GEOM_ONE);
     
 	static CIwSVec2 wh(90, 90);
@@ -54,15 +54,6 @@ void Unit::displayOnScreen(int x, int y){
     
     delete mat;
 }
-
-//
-// Getter and setters
-//
-int Unit::getId(){ return uid; }
-
-void Unit::setId(int uid){ this->uid = uid; }
-
-Player& Unit::getOwner(){ return *owner; }
 
 void Unit::setOwner(Player* p){
 	owner = p;
@@ -76,13 +67,7 @@ void Unit::setOwner(Player* p){
 	}
 }
 
-float Unit::getHp(){ return hp; }
-
-float Unit::getSpeed(){ return speed; }
-
 float Unit::getSize(){ return UNIT_SPRITE_SIZE*scale; }
-
-CIwFVec2 Unit::getVelocity(){ return velocity; }
 
 float Unit::getAngle(){
     CIwFVec2 norm = velocity.GetNormalised();

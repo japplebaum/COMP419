@@ -58,26 +58,17 @@ enum path_mode {
 class Unit : public WorldObject {
     
 	protected:
-	    float hp;
-		float cost;
-		float speed;
-        float scale;
-	
-		int uid;
-
 		bool localPlayedOwnsThis;
 	
 		//info for sprite animation
 		int numFrames;
 		int curFrame;
 
-		CIwFVec2 velocity;	
 		CIwFVec2 navTarget;	//a target the unit will move toward when it's stuck
 		CIwFVec2 navTargetPolar; //polar navigation target
 		path_mode pathMode; //the current pathing mode that we're in
 	
 		CIwFVec2 enemyLeaderPos;
-		Player *owner;
 	
 		std::string unitType;
 	
@@ -89,42 +80,33 @@ class Unit : public WorldObject {
 		void setEscapeTarget(CIwFVec2 toLeader, CIwFVec2 force);
 
     public:
-		Unit(float hp, float cost, float speed, Player* owner, CIwFVec2 position, Game* game);
+		Player *owner;
+		CIwFVec2 velocity;
+		float speed;
+		float hp;
+		float scale;
+		int uid;
+		
+		Unit(float hp, float speed, Player* owner, CIwFVec2 position, Game* game);
 
 		Unit(const Unit& newUnit);
 
 		virtual ~Unit() { };
     	
 		virtual unit_type getType() = 0;
-
-        void setVelocity(const CIwFVec2& velocity);
-    
-        CIwFVec2 getVelocity();
-
-		float getSpeed(); 
 		
-        float getSize();
-	
-		int getId();
-	
-		void setId(int uuid);
-        
-		Player& getOwner();
-	
 		void setOwner(Player* p);
 		
-		float getHp();
-	
-		void setHp(float f);
+        float getSize();
 
 		/** Create a copy of this Unit without having it's header file - no circular includes! */
-		virtual Unit* spawnCopy() { return NULL; };
+		virtual Unit* spawnCopy() { return NULL; }
 	
 		virtual void update() = 0;
 	
         void display();
 	
-        void displayOnScreen(int x, int y);
+        void displayOnScreen(CIwSVec2 pos);
 		
         void receiveDamage(float amount); 
 	
