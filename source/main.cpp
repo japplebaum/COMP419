@@ -31,7 +31,7 @@ bool renderTouches() {
 	for(int i = 0; i < MAX_TOUCHES; ++i) {
         if(touches[i].active) {
             if(touches[i].gesture_type == CREATE_UNIT) {
-                //successful_so_far &= renderDragUnit(&touches[i]);
+                successful_so_far &= renderDragUnit(&touches[i]);
 			}
 		}else {
             all_active = false;
@@ -60,7 +60,7 @@ bool renderUnitCreation(CTouch* touch) {
     }
     
     touch->unit->setPosition(modelCoords);
-	game->addUnit(touch->unit, true);
+	game->addUnit(touch->unit, false); // CHANGE TO TRUE TO REALLY PAY
     
     touch->unit = NULL;
     touch->active = false;

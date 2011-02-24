@@ -1,6 +1,8 @@
 #ifndef _ICING_H_
 #define _ICING_H_
 
+#define ICING_FINAL_SCALE 0.12f
+
 #include "IwRandom.h"
 #include "worldobject.h"
 #include "player.h"
@@ -8,14 +10,9 @@
 class Icing : public WorldObject {
 	
 	private:
-	
 		Player* owner;
-	
-		float angle;
-	
+        float angle;
 		float scale;
-	
-		float finalScale;
 	
 	public:	
 		Icing(const CIwFVec2 position, Game* game, Player* owner);
@@ -23,9 +20,7 @@ class Icing : public WorldObject {
 		Icing(const Icing& newIcing);
 	
 		Player* getOwner();
-	
-		void update();
-	
+		
 		virtual void display();	
 };
 

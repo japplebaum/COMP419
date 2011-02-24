@@ -90,65 +90,50 @@ void polarToXY(CIwFVec2& v) {
 	v.y = r * sin(theta);
 }
 
+//template <class T>
+//CList<T>::CList() {
+//    
+//}
+//
+//template <class T>
+//CList<T>::~CList() {
+//    backingList.clear();
+//    delete &backingList;
+//}
 
-template <class TList>
-void wrapIncr(TList& lst, typename TList::iterator itr){
-    itr++;
-    if(itr == lst.end()) itr = lst.begin();
-}
-
-template <class TList>
-void wrapDecr(TList& lst, typename TList::iterator itr){
-    if(itr == lst.begin()) itr = lst.end();
-    itr--;
-}
-
-void CNode::remove(){
-    prev->next = next;
-    next->prev = prev;
-    delete this;
-}
-
-CList::CList(){
-    head = NULL;
-}
-
-void CList::insert(WorldObject& w){
-    if(head == NULL){
-        head = new CNode();
-        head->value = &w;
-        head->next = head;
-        head->prev = head;
-    } else {
-        CNode *newNode = new CNode();
-        newNode->value = &w;
-        
-        newNode->prev = head->prev;
-        newNode->next = head;
-        
-        head->prev = newNode;        
-        newNode->prev->next = newNode;
-    }
-}
-
-void CList::sort(){
-    bool swapped = true;
+template <class T>
+typename CList<T>::TList *CList<T>::getRange(typename CList<T>::TItr *i, float radius) {
     
-    while(swapped){
-        swapped = false;
-        CNode *itr = head;
+    T *obj = *i;
+
+    typename CList<T>::TItr *left = i, *right = i;
+    typename CList<T>::TList *inRange = new TList();
+
+    while(THETA_DIFF((*left)->getTheta(), obj->getTheta()) <= radius){
+        if(obj == *left) break;
+   
+        if((obj->getPosition() - (*left)->getPosition()).GetLength() <= radius){
+            inRange->push_back(*left);
+        }
+   
+       
+        if(left == backingList.begin())
+            left = backingList.end();
         
-        while(itr->next != head){
-            if(itr->next->value->getTheta() < itr->value->getTheta()){
-                
-                WorldObject *w = itr->value;
-                itr->value = itr->next->value;
-                itr->next->value = w;
-                
-                swapped = true;
-            }
-            
-            itr = itr->next;
-        }   
+        left->prev();
     }
+
+    while(THETA_DIFF(right->value->value->getTheta(), obj->getTheta()) <= radius){
+        if(obj == *right || *left == *right) break;
+
+        if((obj->getPosition() - (*right)->getPosition()).GetLength() <= radius){
+           inRange->push_back(*right);
+        }
+
+        right->next();
+        if(right == backingList.end())
+            right = backingList.begin();
+    }
+
+    return inRange;
 }

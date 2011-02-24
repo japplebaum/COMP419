@@ -9,38 +9,12 @@
 #include "icing.h"
 #include <cmath>
 
-typedef std::map<std::pair<int, float>, bool> IceMap;
+static int iceTiers[3] = {6, 12, 18};
 
 class Spreader : public Unit {
     private:
-        // The maximum radii at which to drop icing.
-	    int maxSpread;
-
-        // The number of ticks since the last icing drop.
-        int sinceLastSpread;
-
-        // The delay between dropping an icing.
-		int spreadDelay;
-        
-        // The maximum number of individual icing to drop. Precomputed at construction.
-        uint maxIcingCount;
-
-        // The current iteration step being used to wind around the spreader's icing radius
-        float currentJump;
-
-        // The current radius where icing is being generated around the spreader.
-        int currentRadius;
-
-        // The maximum amount of icing that can fit on the current radius.
-        int radiusMaxIcing;
-
-        // The total icing spawned on the current radius.
-        int icingThisRadius;
-
-		CIwFVec2 worldRad;
-
-        // Map from (r, theta) centered at the spreader's center to icing pointers.
-        IceMap icingMap;
+        bool icings[36];
+        static const int spreadDelay = 12;
     
 	public:
 		Spreader(Player* owner, Game* game, float x, float y);
@@ -51,8 +25,11 @@ class Spreader : public Unit {
 
 		virtual unit_type getType();
 		virtual Unit* spawnCopy();
-        virtual bool shouldAIUpdate();
-        IceMap* getIcing();
+        virtual bool shouldAIUpdate();    
+    
+        int nearbyIceCount(CIwFVec2 loc);
+        int useNearbyIce(CIwFVec2 loc, int max);
+        CIwFVec2 *closestIce(CIwFVec2 loc);
 };
 
 #endif

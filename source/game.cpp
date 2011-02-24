@@ -1,17 +1,13 @@
 #include "game.h"
 #include "unit.h"
-#include "s3eExt_IPhoneGameKit.h"
+#include "spreader.h"
 
-Game::Game() : numUnits(0), rotation(0),
-        innerRadius(112*.85), outerRadius(358*.85), timesteps(0) {
+Game::Game() : numUnits(0), rotation(0), innerRadius(112*.85), outerRadius(358*.85), timesteps(0) {
 
     IwGetResManager()->LoadGroup("resource_groups/game.group");
 	sprites = IwGetResManager()->GetGroupNamed("Sprites");
 	game = IwGetResManager()->GetGroupNamed("Game");
 	initRenderState();
-            
-    localIcing.clear();
-    opponentIcing.clear();
                     
 	CIwResList* resources = sprites->GetListHashed(IwHashString("CIwTexture"));
 	for(CIwManaged** itr = resources->m_Resources.GetBegin(); itr != resources->m_Resources.GetEnd(); ++itr) {
@@ -26,24 +22,14 @@ Game::~Game(){
 		delete (*itr).second;
 	}
 	
-	for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {
+	for(std::list<Unit*>::iterator itr = (!units)->begin(); itr != (!units)->end(); ++itr) {
 		delete *itr;
 	}
 	
-	for(std::list<Icing*>::iterator itr = localIcing.begin(); itr != localIcing.end(); ++itr) {
-		delete *itr;
-	}
 	
-	for(std::list<Icing*>::iterator itr = opponentIcing.begin(); itr != opponentIcing.end(); ++itr) {
-		delete *itr;
-	}
-	
- 	units.clear();
+ 	(!units)->clear();
 	unitBuffer.clear();
     unitBucket.clear();
-	
-	localIcing.clear();
-	opponentIcing.clear();
     
     sprites->Finalise();
     game->Finalise();
@@ -85,55 +71,43 @@ void Game::initRenderState() {
 	IwGxSetViewMatrix(&view);
 }
 
-std::list<Unit*>* Game::getUnits(){
+CList<Unit>* Game::getUnits(){
 	return &units;
 }
- 
-void Game::addIcing(Icing* i) {
-	if (i->getOwner() == localPlayer) {
-		if(localIcing.empty()) {
-			localIcing.push_back(i);
-		} else {
-			localIcingBuffer.push_back(i);
-		}
-		
-	} else {
-		if(opponentIcing.empty()) {
-			opponentIcing.push_back(i);
-		} else {
-			opponentIcingBuffer.push_back(i);
-		}
-	}
-}
-
 
 void Game::addUnit(Unit *u, bool pay){
     
-    CIwFVec2 pos = u->getPosition();
-    std::list<Icing*> *icing = &localIcing;
-    
-    if(&u->getOwner() == opponentPlayer)
-        icing = &opponentIcing;
-
-    bool paid_for = !pay;
-    if(!paid_for && icing->size() > 0)
-        for(std::list<Icing*>::iterator itr = icing->begin(); itr != icing->end(); ++itr){
-            if(((*itr)->getPosition() - pos).GetLengthSquared() < 1024){
-                icing->erase(itr);
-                paid_for = true;
-                break;
+    if(pay){
+        CIwFVec2 pos = u->getPosition();
+        int cost = unitCosts[u->getType()];
+        std::list<Spreader *> spreaders;
+        
+        
+        for(std::list<Unit*>::iterator itr = (!units)->begin(); itr != (!units)->end(); ++itr){
+            Player p = (*itr)->getOwner(),
+                   q = u->getOwner();
+            if(&p == &q && (*itr)->getType() == SPREADER){
+                cost -= ((Spreader *)(*itr))->nearbyIceCount(pos);
+                spreaders.push_back((Spreader *)(*itr));
             }
         }
-	
-    /*if(!paid_for) {
-		delete u;
-		return;
-	}*/
+        
+        if(cost <= 0){
+            cost = unitCosts[u->getType()];
+            for(std::list<Spreader*>::iterator itr = spreaders.begin(); itr != spreaders.end(); ++itr){
+                cost -= (*itr)->useNearbyIce(pos, cost);
+            }
+        } else {
+            delete u;
+            return;
+        }
+    }
 
     u->setId(numUnits++);
+    unitBuffer.push_back(u);
 
 	//mirror player
-	if (!s3eExtIPhoneGameKitAvailable() && u->getType() != WRECKER && u->getType() != PROJECTILE) {
+	if (u->getType() != WRECKER && u->getType() != PROJECTILE) {
 		Unit* mirror = u->spawnCopy();
 		if (mirror != NULL) {
 			mirror->setOwner(opponentPlayer);
@@ -142,37 +116,23 @@ void Game::addUnit(Unit *u, bool pay){
 		}
 	}
 				
-	unitBuffer.push_back(u);
 }
 
 void Game::tick(){
 
-	for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {
+	for(std::list<Unit*>::iterator itr = (!units)->begin(); itr != (!units)->end(); ++itr) {
         (*itr)->update(itr);
 		if (timesteps % 12 == 0) (*itr)->detectEnemy(itr);
     }
     
-    for(std::list<Unit*>::iterator itr = units.begin(); itr != units.end(); ++itr) {
+    for(std::list<Unit*>::iterator itr = (!units)->begin(); itr != (!units)->end(); ++itr) {
         if((*itr)->getHp() <= 0){
 			// Remove the unit from all data structures
 			unitBucket[(*itr)->getTextureName()]->erase(unitBucket[(*itr)->getTextureName()]->find((*itr)));
 			delete *itr;
-            itr = units.erase(itr);
+            itr = (!units)->erase(itr);
         }
     }  
-	
-	for(std::list<Icing*>::iterator itr = localIcing.begin(); itr != localIcing.end(); ++itr) {
-        Icing* foo = *itr;
-		(*itr)->update();
-	
-        //if(itr != localIcing.begin() &&
-		//       ((*itr)->getPosition() + (*(itr-1))->getPosition())->GetLengthSquared() < 15)
-		//  localIcing->erase(itr);
-	}
-	
-	for(std::list<Icing*>::iterator itr = opponentIcing.begin(); itr != opponentIcing.end(); ++itr) {
-		(*itr)->update();
-	}
     
 	for (std::list<Unit*>::iterator itr = unitBuffer.begin(); itr != unitBuffer.end(); ++itr) {
 		Unit* u = *itr;
@@ -183,21 +143,14 @@ void Game::tick(){
 	
 	
     unitBuffer.sort();
-    units.merge(unitBuffer);
-	
-    localIcingBuffer.sort();
-	localIcing.merge(localIcingBuffer);
-    
-    opponentIcingBuffer.sort();
-	opponentIcing.merge(opponentIcingBuffer);
+    (!units)->merge(unitBuffer);
     
     ++timesteps;
 }
 
 void Game::render() {		    
 	renderWorld();
-	renderIcing();
-	renderSprites();
+   	renderSprites();
 }
 
 void Game::renderSprites() {
@@ -228,25 +181,6 @@ void Game::renderSprites() {
 	delete mat;
 }
 
-void Game::renderIcing() {
-	
-	CIwMaterial* mat = new CIwMaterial();
-	mat->SetTexture((CIwTexture*)game->GetResNamed("icing", IW_GX_RESTYPE_TEXTURE));
-	mat->SetModulateMode(CIwMaterial::MODULATE_RGB);
-	mat->SetAlphaMode(CIwMaterial::ALPHA_BLEND);
-	IwGxSetMaterial(mat);
-	
-	for (std::list<Icing*>::iterator itr = localIcing.begin(); itr != localIcing.end(); ++itr) {
-		(*itr)->display();
-	}
-	
-	for (std::list<Icing*>::iterator itr = opponentIcing.begin(); itr != opponentIcing.end(); ++itr) {
-		(*itr)->display();
-	}
-	
-	delete mat;
-}
-
 void Game::renderWorld() {
 
 	CIwMaterial* mat = new CIwMaterial();
@@ -258,14 +192,6 @@ void Game::renderWorld() {
 	renderImageWorldSpace(CIwFVec2::g_Zero, 0.0, 0.85, 960, rotation, 0, 1, 0.0f);
 	
 	delete mat;
-}
-
-std::list<Icing*>* Game::getLocalIcing() {
-	return &localIcing;
-}
-
-std::list<Icing*>* Game::getOpponentIcing() {
-	return &opponentIcing;
 }
 
 CIwFVec2 Game::getWorldRadius() {

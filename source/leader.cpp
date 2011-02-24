@@ -13,8 +13,8 @@ Leader::Leader(Player* owner, Game* game, float x, float y)
     CIwFVec2 icePos(r, theta);
     icePos.x -= 30;
     polarToXY(icePos);
-    Icing* ice = new Icing(icePos, game, owner);
-    game->addIcing(ice);
+            
+    // ADD MY ICING
 }
 
 bool Leader::update(std::list<Unit*>::iterator itr){

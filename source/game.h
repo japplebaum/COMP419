@@ -25,29 +25,19 @@ typedef std::map<unsigned int, std::set<Unit*>* > UnitBucket;
 class Game {
 	
     private:
-        CIwFVec2 localLeaderPos;
-        CIwFVec2 opponentLeaderPos;
+        CIwFVec2 localLeaderPos, opponentLeaderPos;
 	
-		Player* localPlayer;
-		Player* opponentPlayer;
+		Player *localPlayer, *opponentPlayer;
 	
         int numPlayers;
 
-        std::list<Unit*> units;
+        CList<Unit> units;
         int numUnits;
 
 		// Queue of units we're set to 
 		std::list<Unit*> unitBuffer;
-	
-		//Queues of icing waiting to be inserted
-		std::list<Icing*> localIcingBuffer;
-		std::list<Icing*> opponentIcingBuffer;
-	
-		std::list<Icing*> localIcing;
-		std::list<Icing*> opponentIcing;
 
-		CIwResGroup* sprites;
-		CIwResGroup* game;
+		CIwResGroup *sprites, *game;
 
 		
 		// Map from texture name to sets of unit pointers.
@@ -64,9 +54,7 @@ class Game {
 		void initRenderState();
 		
 		void renderSprites();
-	
-		void renderIcing();
-	
+		
 		void renderWorld();
 	
 		void renderUI();
@@ -77,13 +65,8 @@ class Game {
 		~Game();
         
         void addUnit(Unit *u, bool pay = false);
-		std::list<Unit*>* getUnits();
-	
-		void addIcing(Icing* i);
-	
-		std::list<Icing*>* getLocalIcing();
-	
-		std::list<Icing*>* getOpponentIcing();
+		CList<Unit>* getUnits();
+
 		UnitBucket* getUnitBucket();
 		/**
 		 * Gets the inner and outer radii of the world donut.

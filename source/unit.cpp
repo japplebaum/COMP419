@@ -195,13 +195,13 @@ void Unit::path(std::list<Unit*>::iterator itr) {
 	 ********************************/
 	
 	
-	std::list<Unit*>* units = game->getUnits(); //all the units in the game
+	CList<Unit> units = *(game->getUnits()); //all the units in the game
 	CIwFVec2 force = CIwFVec2::g_Zero; //sum of all forces on this unit
 	CIwFVec2 dirToward = CIwFVec2::g_Zero; //vector from current repelling unit to this unit
 	Unit* curUnit; //current repelling unit in loop
 	
 	//sum up all of the repulsive forces on this unit
-	for (itr = units->begin() ; itr != units->end(); ++itr) {
+	for (itr = units.backingList.begin() ; itr != units.backingList.end(); ++itr) {
 		curUnit = *(itr);
 		
 		if (curUnit != this && curUnit->getType() != PROJECTILE) {
@@ -334,10 +334,12 @@ void Unit::setEscapeTarget(CIwFVec2 toLeader, CIwFVec2 force) {
 
 
 void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
-    std::list<Unit*>* units = game->getUnits();
-    if(units->empty()) {
+    CList<Unit> units = *(game->getUnits());
+    
+    if((!units)->empty()) {
         return;
     }
+    
     CIwFVec2 position = (*unit_itr)->getPosition() + (*unit_itr)->getVelocity();
     CIwFVec2 otherPos = CIwFVec2::g_Zero;
     
@@ -361,7 +363,7 @@ void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
     std::list<Unit*>::iterator decr_theta_itr = unit_itr;
     
     incr_theta_itr++;
-    if(incr_theta_itr == units->end()) incr_theta_itr = units->begin();
+    if(incr_theta_itr == units.backingList.end()) incr_theta_itr = units.backingList.begin();
     
     while(incr_theta_itr != unit_itr && sq_dist <= max_dist) {
 	// Look up theta, which means we're moving to the BACK of the container
@@ -377,7 +379,7 @@ void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
 		}
         
         incr_theta_itr++;
-        if(incr_theta_itr == units->end()) incr_theta_itr = units->begin();
+        if(incr_theta_itr == units.backingList.end()) incr_theta_itr = units.backingList.begin();
 	}
 
 	// Must reset the distance here since we're switching directions.
@@ -395,7 +397,7 @@ void Unit::detectEnemy(std::list<Unit*>::iterator unit_itr) {
 			}
 		}
 
-        if(decr_theta_itr == units->begin()) decr_theta_itr = units->end();
+        if(decr_theta_itr == units.backingList.begin()) decr_theta_itr = units.backingList.end();
         decr_theta_itr--;
 
 	}
