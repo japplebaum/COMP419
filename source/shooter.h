@@ -16,7 +16,7 @@ class Shooter : public AttackingUnit {
 		virtual Unit* spawnCopy();
 
         void attack();
-			
+	
 	private:
 	
 		int projectileCount;

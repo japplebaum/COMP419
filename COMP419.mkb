@@ -27,8 +27,6 @@ files
     wrecker.cpp   
 	worldobject.h
 	worldobject.cpp
-	icing.h
-	icing.cpp
 	leader.h
 	leader.cpp
 	projectile.h

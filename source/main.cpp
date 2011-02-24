@@ -60,7 +60,7 @@ bool renderUnitCreation(CTouch* touch) {
     }
     
     touch->unit->setPosition(modelCoords);
-	game->addUnit(touch->unit, true);
+	game->addUnit(touch->unit, false); // CHANGE TO TRUE TO REALLY PAY
     
     touch->unit = NULL;
     touch->active = false;
@@ -195,26 +195,30 @@ void init(){
     
     CIwColour localCol = {255, 180, 180, 255};
 	CIwColour opponentCol = {180, 255, 160, 255};
-	
+
+    game = new Game();
+
 	localPlayer = new Player(localCol);
 	opponentPlayer = new Player(opponentCol);
-    
-    game = new Game(localPlayer, opponentPlayer);
-    	
-    CIwFVec2 pos(game->getWorldRadius().y, PI/30);
-    polarToXY(pos);
-	Leader* localLeader = new Leader(localPlayer, CIwFVec2(pos), game);
-    pos.x = game->getWorldRadius().y;
-    pos.y = PI - PI/30;
-    polarToXY(pos);
-	Leader* opponentLeader = new Leader(opponentPlayer, CIwFVec2(pos), game);
-    
-	game->addUnit(localLeader);
-	game->addUnit(opponentLeader);
-	
+
+    game->setLocalPlayer(localPlayer);
+    game->setOpponentPlayer(opponentPlayer);
+
+    CIwFVec2 localLeaderPos(game->getWorldRadius().y, PI/30);
+    CIwFVec2 opponentLeaderPos(game->getWorldRadius().y, PI - PI/30);
+    polarToXY(localLeaderPos);
+    polarToXY(opponentLeaderPos);
+    game->setLeaderPositions(localLeaderPos, opponentLeaderPos);
+
+	Leader* localLeader = new Leader(localPlayer, localLeaderPos, game);
+	Leader* opponentLeader = new Leader(opponentPlayer, opponentLeaderPos,game);
+
 	localPlayer->setLeader(localLeader);
 	opponentPlayer->setLeader(opponentLeader);
-	
+
+    game->addUnit(localLeader);
+	game->addUnit(opponentLeader);
+    
     frameCount = 0;
 }
 

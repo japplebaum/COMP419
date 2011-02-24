@@ -90,15 +90,50 @@ void polarToXY(CIwFVec2& v) {
 	v.y = r * sin(theta);
 }
 
+//template <class T>
+//CList<T>::CList() {
+//    
+//}
+//
+//template <class T>
+//CList<T>::~CList() {
+//    backingList.clear();
+//    delete &backingList;
+//}
 
-template <class TList>
-void wrapIncr(TList& lst, typename TList::iterator itr){
-    itr++;
-    if(itr == lst.end()) itr = lst.begin();
-}
+template <class T>
+typename CList<T>::TList *CList<T>::getRange(typename CList<T>::TItr *i, float radius) {
+    
+    T *obj = *i;
 
-template <class TList>
-void wrapDecr(TList& lst, typename TList::iterator itr){
-    if(itr == lst.begin()) itr = lst.end();
-    itr--;
+    typename CList<T>::TItr *left = i, *right = i;
+    typename CList<T>::TList *inRange = new TList();
+
+    while(THETA_DIFF((*left)->getTheta(), obj->getTheta()) <= radius){
+        if(obj == *left) break;
+   
+        if((obj->getPosition() - (*left)->getPosition()).GetLength() <= radius){
+            inRange->push_back(*left);
+        }
+   
+       
+        if(left == backingList.begin())
+            left = backingList.end();
+        
+        left->prev();
+    }
+
+    while(THETA_DIFF(right->value->value->getTheta(), obj->getTheta()) <= radius){
+        if(obj == *right || *left == *right) break;
+
+        if((obj->getPosition() - (*right)->getPosition()).GetLength() <= radius){
+           inRange->push_back(*right);
+        }
+
+        right->next();
+        if(right == backingList.end())
+            right = backingList.begin();
+    }
+
+    return inRange;
 }

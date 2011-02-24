@@ -13,10 +13,11 @@ class Unit;
 #include "player.h"
 #include "IwDebugPrim.h"
 
+class Leader;
+
 #define UNIT_SPRITE_SIZE 256
 
 #define PATH_THETA_RANGE PI
-#define THETA_DIFF(X, Y) (min(abs((X)-(Y)), 2*PI - abs((X) - (Y))))
 #define REPEL_FACTOR 8000000
 #define LEADER_ATTRACTION 1000
 #define CIRCLE_SPRING .0015f
@@ -34,6 +35,8 @@ static float statAttacks[7][7] = {
 	{0		   , 20	     ,	0		,	4	  ,     12  ,     0  ,  0    }, // Leader
 	{0		   , 0	     ,	0		,	0	  ,     0   ,     0  ,  0    }, // Projectile
 };
+
+static int unitCosts[7] = {1, 1, 1, 1, 1, 1, 1};
 
 /**
 This lets us quickly determine a unit's type at run time.

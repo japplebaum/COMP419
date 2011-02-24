@@ -19,7 +19,7 @@ class Wrecker : public AttackingUnit {
 		virtual Unit* spawnCopy();
 	
         virtual void attack();
-	
+
 		virtual void setAttackSprite();
 	
 		virtual void setIdleSprite();

@@ -17,7 +17,6 @@
 class Game;
 
 #include "unit.h"
-#include "icing.h"
 #include "player.h"
 
 typedef std::map<unsigned int, std::set<Unit*>* > UnitBucket;
@@ -25,27 +24,19 @@ typedef std::map<unsigned int, std::set<Unit*>* > UnitBucket;
 class Game {
 	
     private:
+        CIwFVec2 localLeaderPos, opponentLeaderPos;
 	
-		Player* localPlayer;
-		Player* opponentPlayer;
+		Player *localPlayer, *opponentPlayer;
 	
         int numPlayers;
 
-        std::list<Unit*> units;
+        CList<Unit> units;
         int numUnits;
 
 		// Queue of units we're set to 
 		std::list<Unit*> unitBuffer;
-	
-		//Queues of icing waiting to be inserted
-		std::list<Icing*> localIcingBuffer;
-		std::list<Icing*> opponentIcingBuffer;
-	
-		std::list<Icing*> localIcing;
-		std::list<Icing*> opponentIcing;
 
-		CIwResGroup* sprites;
-		CIwResGroup* game;
+		CIwResGroup *sprites, *game;
 
 		
 		// Map from texture name to sets of unit pointers.
@@ -62,26 +53,19 @@ class Game {
 		void initRenderState();
 		
 		void renderSprites();
-	
-		void renderIcing();
-	
+		
 		void renderWorld();
 	
 		void renderUI();
 	                    
     public:
 	
-        Game(Player* _local, Player* _opponent);
+        Game();
 		~Game();
         
         void addUnit(Unit *u, bool pay = false);
-		std::list<Unit*>* getUnits();
-	
-		void addIcing(Icing* i);
-	
-		std::list<Icing*>* getLocalIcing();
-	
-		std::list<Icing*>* getOpponentIcing();
+		CList<Unit>* getUnits();
+
 		UnitBucket* getUnitBucket();
 		
 		/**
@@ -106,6 +90,12 @@ class Game {
     
         Player *getLocalPlayer();
 		Player *getOpponentPlayer();
+
+        void setLocalPlayer(Player* local);
+        void setOpponentPlayer(Player* opponent);
+        void setLeaderPositions(CIwFVec2 &local, CIwFVec2 &opponent);
+        CIwFVec2 getLocalLeaderPos();
+        CIwFVec2 getOpponentLeaderPos();
 
 };
 

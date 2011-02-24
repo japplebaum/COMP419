@@ -1,4 +1,5 @@
 #include "unit.h"
+#include "leader.h"
 #include "IwGeom.h"
 
 Unit::Unit(const Unit& newUnit): WorldObject(newUnit), hp(newUnit.hp), 
@@ -60,10 +61,10 @@ void Unit::setOwner(Player* p){
     localPlayedOwnsThis = owner == game->getLocalPlayer();
 	
 	if (localPlayedOwnsThis) {
-		enemyLeaderPos = ((Unit*)(game->getOpponentPlayer()->getLeader()))->getPosition();
+        enemyLeaderPos = game->getOpponentLeaderPos();
 	}
 	else {
-		enemyLeaderPos = ((Unit*)(game->getLocalPlayer()->getLeader()))->getPosition();
+        enemyLeaderPos = game->getLocalLeaderPos();
 	}
 }
 
@@ -92,13 +93,14 @@ void Unit::path() {
 	 ********************************/
 	
 	
-	std::list<Unit*>* units = game->getUnits(); //all the units in the game
+	CList<Unit> units = *(game->getUnits()); //all the units in the game
 	CIwFVec2 force = CIwFVec2::g_Zero; //sum of all forces on this unit
 	CIwFVec2 dirToward = CIwFVec2::g_Zero; //vector from current repelling unit to this unit
 	Unit* curUnit; //current repelling unit in loop
 	
 	//sum up all of the repulsive forces on this unit
-	for (std::list<Unit*>::iterator itr = units->begin() ; itr != units->end(); ++itr) {
+
+	for (std::list<Unit *>::iterator itr = units.backingList.begin() ; itr != units.backingList.end(); ++itr) {
 		curUnit = *(itr);
 		
 		if (curUnit != this && curUnit->getType() != PROJECTILE) {
