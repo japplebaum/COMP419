@@ -5,7 +5,6 @@ Muncher::Muncher(Player* owner, CIwFVec2 position, Game* game)
 {
 	numFrames = 12;
 	scale = .2f;
-	
 	texture_names.push_back(IwHashString("muncher_sprite_sheet"));
 }
 

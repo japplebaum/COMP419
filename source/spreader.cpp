@@ -2,6 +2,10 @@
 
 Spreader::Spreader(Player* owner, CIwFVec2 position, Game* game)
         : Unit(250.0f, 0.0f, owner, position, game) {
+	
+	scale = .25f;
+	numFrames = 11;
+	texture_names.push_back(IwHashString("spreader_sprite_sheet"));
 }
 
 Spreader::Spreader(const Spreader& newSpreader) : Unit(newSpreader) {

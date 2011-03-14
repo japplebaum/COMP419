@@ -2,7 +2,7 @@
 
 WorldObject::WorldObject(Game* game) :
 game(game), current_texture_index(0)
-{}
+{ }
 
 WorldObject::WorldObject(CIwFVec2 position, Game* game) 
 	: game(game), current_texture_index(0)

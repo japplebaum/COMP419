@@ -109,6 +109,7 @@ void Game::addUnit(Unit *u, bool pay){
 	if (u->getType() != WRECKER && u->getType() != PROJECTILE) {
 		Unit* mirror = u->spawnCopy();
 		if (mirror != NULL) {
+			s3eDebugOutputString("mirror unit");
 			mirror->setOwner(opponentPlayer);
 			mirror->setPolarPosition(u->getR(), PI - u->getTheta());
 			unitBuffer.push_back(mirror);
@@ -138,7 +139,6 @@ void Game::tick(){
 			unitBucket[u->getTextureName()] = new std::set<Unit*>();
 		(unitBucket[u->getTextureName()])->insert(u);
 	}
-	
 	
     unitBuffer.sort();
     (!units)->merge(unitBuffer);

@@ -16,14 +16,11 @@ class Unit;
 class Leader;
 
 #define UNIT_SPRITE_SIZE 256
-
-#define PATH_THETA_RANGE PI
 #define REPEL_FACTOR 8000000
-#define LEADER_ATTRACTION 1000
 #define CIRCLE_SPRING .0015f
-#define FORCE_THRESHOLD 12000
 #define NAV_ATTRACT_FACTOR 1000
-#define NORMAL_FORCE_THRESHOLD 40000
+#define FORCE_THRESHOLD SQ((NAV_ATTRACT_FACTOR/64))
+#define NORMAL_FORCE_THRESHOLD 100
 
 static float statAttacks[7][7] = {
 	// Muncher | Shooter | Spreader | Wrecker | Thrower | Leader | Projectile
@@ -48,39 +45,60 @@ enum unit_type {
 /**
 Pathing modes that a unit can be in
  
-NORMAL: all is well - move toward the enemy leader and do circular pathing
+TOLEADER: all is well - move toward the enemy leader and do circular pathing
 ESCAPE: fell into equilibrium - ignore enemy leader and circular pathing, 
 		go to a wall
 OBJECTIVE: trying to go somewhere/chase something - ignore enemy leader, 
 		   but not circular pathing
 */
 enum path_mode {
-	NORMAL, ESCAPE, OBJECTIVE
+	TOLEADER, ESCAPE, OBJECTIVE
 };
 
 class Unit : public WorldObject {
     
-	protected:
-		bool localPlayedOwnsThis;
+	private:	
+		/** Get the attractive force exerted by the enemy leader */
+		CIwFVec2 getLeaderForce();
 	
+		/** Calculate the sum of all repulsive forces on this unit */
+		CIwFVec2 getRepulsiveForce();
+	
+		/** Get the "spring force" that drives the unit toward pathing
+		 in a circular fashion" */
+		CIwFVec2 getCircularForce();
+	
+		/** Get the repulsive force exhbited by the nearest wall on this
+		 unit. If we're not at a wall, then it's just the zero vector */
+		CIwFVec2 getWallForce(CIwFVec2 sumForces);
+	
+		/** Get the attractive force exhbited by the navigation target
+		 for escape/objective pathing */
+		CIwFVec2 getNavTargetForce();
+	
+		/** Create a target (the inner or outer wall) for escape pathing */
+		void createEscapeTarget();
+	
+		/** Move the escape target while escape pathing so that we can
+		 "drag" the unit out forward of its predicament */
+		void updateEscapeTarget(CIwFVec2 sumForces);
+	
+		/** Based on this unit's current position, determine the angular 
+		 direction toward the the enemy leader */
+		int dirToEnemyAngular();
+	
+	protected:	
 		//info for sprite animation
 		int numFrames;
 		int curFrame;
 
-		CIwFVec2 navTarget;	//a target the unit will move toward when it's stuck
-		CIwFVec2 navTargetPolar; //polar navigation target
-		path_mode pathMode; //the current pathing mode that we're in
+		CIwFVec2 navTarget;	// a target the unit will move toward when it's stuck
+		CIwFVec2 navTargetPolar; // the same target, but in polar coordinates
+		path_mode pathMode; // the current pathing mode that we're in
 	
 		CIwFVec2 enemyLeaderPos;
 	
 		std::string unitType;
-	
-		/** 
-		 Calculate a target (the inner or outer wall) for escape pathing
-		 @param toLeader vector pointing from this unit to the enemy leader
-		 @param the sum of the forces currently acting on this unit
-		 */
-		void setEscapeTarget(CIwFVec2 toLeader, CIwFVec2 force);
 
     public:
 		Player *owner;
